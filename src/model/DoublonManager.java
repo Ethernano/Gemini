@@ -10,6 +10,7 @@ import java.util.HashMap;
 public class DoublonManager {
 	private ArrayList<FileWithCrc> files;
 	private HashMap<Integer, ArrayList<FileWithCrc>> groupMap = new HashMap<>();
+	private ArrayList<File> doublonFileList;
 
 	public DoublonManager(ArrayList<FileWithCrc> files) {
 		this.files = files;
@@ -32,13 +33,22 @@ public class DoublonManager {
 			prevCrc = file.getCrc();
 		}
 		
+		doublonFileList = new ArrayList<File>();
+		
 		System.out.println("Groups : ");
 		for (int n = 1;n<=groupMap.size();n++) {
-			System.out.println("Group "+n);
-			for (FileWithCrc file : groupMap.get(n)) {
-				System.out.println(file.getFile()+" "+file.getCrc());
+			if (groupMap.get(n).size()>1) {
+				System.out.println("Group "+n);
+				for (FileWithCrc file : groupMap.get(n)) {
+					System.out.println(file.getFile()+" "+file.getCrc());
+					doublonFileList.add(file.getFile());
+				}
 			}
 		}
+	}
+	
+	public ArrayList<File> getDoublonFileList() {
+		return doublonFileList;
 	}
 
 	

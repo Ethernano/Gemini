@@ -16,6 +16,8 @@ import java.util.concurrent.Future;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 
+import com.sun.org.apache.bcel.internal.generic.DMUL;
+
 import model.DoublonManager;
 import model.FileLister;
 import model.FileWithCrc;
@@ -24,10 +26,13 @@ public class TreatmentSwingWorker extends SwingWorker<Integer, String>{
 	public SwingView view;
 	public boolean withCrc;
 	public ArrayList<FileWithCrc> results;
+	private DoublonManager dManage;
+	private ArrayList<File> files;
 	
-	public TreatmentSwingWorker(SwingView swingView, boolean withCrc) {
+	public TreatmentSwingWorker(SwingView swingView, boolean withCrc, ArrayList<File> files) {
 		this.view = swingView;
 		this.withCrc = withCrc;
+		this.files = files;
 		this.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -43,16 +48,13 @@ public class TreatmentSwingWorker extends SwingWorker<Integer, String>{
 	protected Integer doInBackground() throws Exception {
 		view.getProgressBar().setIndeterminate(true);
 		
-		ArrayList<File> folders = new ArrayList<File>();
-		folders.add(new File("C:\\Users\\Guida\\Videos"));
 
-		FileLister fileLister = new FileLister(folders);
 		
-		System.out.println("processing "+fileLister.getFiles().size());
+		System.out.println("processing "+files.size());
 
 		List<Callable<FileWithCrc>> tasks = new ArrayList<Callable<FileWithCrc>>();
 
-		for (File file : fileLister.getFiles()) {
+		for (File file : files) {
 			tasks.add( new FileCrc32RecursiveTask(file,withCrc) );
 		}
 
@@ -105,12 +107,16 @@ public class TreatmentSwingWorker extends SwingWorker<Integer, String>{
 	protected void done() {
 		super.done();
 		if (getResults() != null) {
-			DoublonManager dManage = new DoublonManager(getResults());
+			dManage = new DoublonManager(getResults());
 		}
 	}
 
 	public ArrayList<FileWithCrc> getResults() {
 		return results;
+	}
+
+	public DoublonManager getdManage() {
+		return dManage;
 	}
 	
 }
